@@ -1,0 +1,24 @@
+[submodule "gaia"]
+	path = gaia
+	url = https://github.com/projects4me/gaia.git
+	branch = dev
+[submodule "prometheus"]
+	path = prometheus
+	url = https://github.com/projects4me/prometheus.git
+	branch = dev
+[submodule "hermes"]
+	path = hermes
+	url = https://github.com/projects4me/hermes.git
+	branch = dev
+[submodule "ares"]
+	path = ares
+	url = https://github.com/projects4me/ares.git
+	branch = dev
+[submodule "docker-images"]
+	path = docker-images
+	url = https://github.com/projects4me/docker-images.git
+	branch = master
+[submodule "dev-tools"]
+	path = dev-tools
+	url = https://github.com/projects4me/dev-tools.git
+	branch = main
