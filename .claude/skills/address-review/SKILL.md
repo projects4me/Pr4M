@@ -7,9 +7,13 @@ argument-hint: "<repo> <pr-number> [issue-number]"
 # Address a PR review
 
 1. `dev-tools/ai/ai timer <issue>` (start the time checkpoint), then
-   `dev-tools/ai/ai review <repo> <pr> --open` - only threads without my reply, plus follow-ups.
+   `dev-tools/ai/ai review <repo> <pr> --open`: only unresolved threads without my reply, plus follow-ups. Bot
+   boilerplate (analysis chains, "Prompt for AI Agents" restatements, walkthroughs) is folded to one line each;
+   the finding text is kept in full. Use `--raw` only if a folded block is needed.
 2. For each thread decide: change, or explain (with evidence) why not. Treat reviewer direction as a standing rule: if it generalises (e.g. "no custom REST actions"), save it to memory `gaia-rest-and-testing-rules` (or a new feedback memory).
-3. Make the changes on the existing branch (`git checkout claude-issue-<issue>`). Prefer reverting to `origin/dev` over hand-undoing. Re-run tests via the `test-runner` agent.
+3. Make the changes on the existing branch (`git checkout claude-issue-<issue>`). Prefer reverting to `origin/dev` over hand-undoing.
+   While fixing, check with `dev-tools/ai/ai test <repo> --changed` (seconds); before committing, the full
+   `dev-tools/ai/ai test <repo>` via the `test-runner` agent.
 4. Commit as a **new** commit (no amend/force-push):
    `dev-tools/ai/ai commit <repo> <issue> -F <msg-file> --files ...` (message: `refactor|fix(scope): ... Review feedback on #<pr>`).
 5. Reply to every thread in one call: write `{"<comment id>": "<reply>"}` to a JSON file, then
