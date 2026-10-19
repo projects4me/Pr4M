@@ -22,7 +22,7 @@ Works on Windows 10/11, macOS and Ubuntu/Debian.
 ```bash
 git clone --recurse-submodules --remote-submodules https://github.com/projects4me/Pr4M.git
 cd Pr4M
-dev-tools/installer/p4m repos sync   # every repo on its branch (Windows: dev-tools\installer\p4m.cmd ...)
+git submodule foreach 'git switch $(git config -f $toplevel/.gitmodules submodule.$name.branch)'   # on branches, not detached
 dev-tools/installer/p4m setup        # only if you run the stack locally (Docker)
 dev-tools/installer/p4m configure    # your settings + the shared Agent Odysseus credentials
 ```
@@ -36,7 +36,8 @@ The repos follow their branches, not the commits this repo records: gaia, promet
 docker-images follows `master`, and dev-tools follows `main`. Nobody works at a pinned commit, so a change in a
 sub-repo **never** needs a commit here.
 
-- `--remote-submodules` clones each repo at the tip of its branch.
+- `--remote-submodules` clones each repo at the tip of its branch, but **detached**. The `git submodule foreach`
+  line puts each one **on** its branch (`dev`, `master` or `main`), so you can pull and commit straight away.
 - **`dev-tools/installer/p4m repos sync`** brings everything to the latest. It fast-forwards this workspace,
   switches each repo to its branch and pulls. Repos with local changes, or on another branch, are left alone with a
   warning. Run it whenever you want to catch up.
