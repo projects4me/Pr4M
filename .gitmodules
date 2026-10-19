@@ -2,23 +2,29 @@
 	path = gaia
 	url = https://github.com/projects4me/gaia.git
 	branch = dev
+	ignore = all
 [submodule "prometheus"]
 	path = prometheus
 	url = https://github.com/projects4me/prometheus.git
 	branch = dev
+	ignore = all
 [submodule "hermes"]
 	path = hermes
 	url = https://github.com/projects4me/hermes.git
 	branch = dev
+	ignore = all
 [submodule "ares"]
 	path = ares
 	url = https://github.com/projects4me/ares.git
 	branch = dev
+	ignore = all
 [submodule "docker-images"]
 	path = docker-images
 	url = https://github.com/projects4me/docker-images.git
 	branch = master
+	ignore = all
 [submodule "dev-tools"]
 	path = dev-tools
 	url = https://github.com/projects4me/dev-tools.git
 	branch = main
+	ignore = all

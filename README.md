@@ -17,28 +17,32 @@ Each repo has its own `CLAUDE.md` with its rules; they assume this workspace lay
 
 ## Get started
 
-Works on Windows 10/11 (Git Bash + Docker Desktop), macOS and Ubuntu/Debian.
+Works on Windows 10/11, macOS and Ubuntu/Debian.
 
 ```bash
-git clone --recurse-submodules https://github.com/projects4me/Pr4M.git
+git clone --recurse-submodules --remote-submodules https://github.com/projects4me/Pr4M.git
 cd Pr4M
-dev-tools/installer/p4m setup        # Windows: dev-tools\installer\p4m.cmd setup
+dev-tools/installer/p4m repos sync   # every repo on its branch (Windows: dev-tools\installer\p4m.cmd ...)
+dev-tools/installer/p4m setup        # only if you run the stack locally (Docker)
 dev-tools/installer/p4m configure    # your settings + the shared Agent Odysseus credentials
 ```
 
-Then open Claude Code in this folder. Full details and prerequisites (Python 3.10+, Docker, git, Node 22.15+
-for Talos, GitHub CLI): [dev-tools/README.md](https://github.com/projects4me/dev-tools#readme).
+Then open Claude Code in this folder. Full details and prerequisites (Python 3.10+, git, Node 22.15+ for Talos,
+GitHub CLI; Docker for the local stack): [dev-tools/README.md](https://github.com/projects4me/dev-tools#readme).
 
-## Working in the submodules
+## Always on the latest
 
-The submodules start detached at the commit this repo pins. Before working in one, check out its branch:
+The repos follow their branches, not the commits this repo records: gaia, prometheus, hermes and ares follow `dev`,
+docker-images follows `master`, and dev-tools follows `main`. Nobody works at a pinned commit, so a change in a
+sub-repo **never** needs a commit here.
 
-```bash
-git -C gaia switch dev && git -C gaia pull --ff-only     # gaia, prometheus, hermes, ares: dev
-```
-
-The Claude Code workflow (`/start-issue <n>`) does this for you and branches `claude-issue-<n>` from an up-to-date
-`dev`. To move every submodule to the latest upstream branch: `git submodule update --remote`.
+- `--remote-submodules` clones each repo at the tip of its branch.
+- **`dev-tools/installer/p4m repos sync`** brings everything to the latest. It fast-forwards this workspace,
+  switches each repo to its branch and pulls. Repos with local changes, or on another branch, are left alone with a
+  warning. Run it whenever you want to catch up.
+- The Claude Code workflow (`/start-issue <n>`) syncs `dev` itself before branching `claude-issue-<n>`.
+- `.gitmodules` sets `ignore = all`, so repos moving ahead never show as changes here, and nobody records a pin
+  by accident.
 
 ## Licence
 
