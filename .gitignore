@@ -1,0 +1,13 @@
+# Workspace files shared separately for now (by email), not through the repo.
+/CLAUDE.md
+/Projects4Me — Engineering Guide for Claude Code.md
+
+# Personal Claude Code settings
+.claude/settings.local.json
+CLAUDE.local.md
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
