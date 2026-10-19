@@ -22,7 +22,14 @@ description: Projects4Me local stack reference - p4m CLI, local URLs, containers
 - hermes: `npm install`; `npm start` (:9000). `docker compose up` → hermes :9000 (→ gaia :8080), hermes-test :9001 (→ gaia-test :8081).
 - ares: `pip install -r requirements.txt`; `ANTHROPIC_API_KEY=... uvicorn app.main:app --port 8000 --reload`.
 
+## Containers and checkouts
+- The shared containers serve the folder `p4m up` was last run from, which may be another workspace on this
+  machine. Check with `docker inspect gaia-test --format '{{range .Mounts}}{{.Source}} {{end}}'`. Tests handle
+  this themselves (`p4m test` / `ai test`); for anything else (migrations, debug scripts) make sure the container
+  serves this checkout before trusting the result.
+
 ## Windows / Git Bash gotchas
+- Use `python`, never `python3`: on Windows `python3` can be the Microsoft Store stub, which hangs until the timeout.
 - `docker exec -w /var/www/html …` from Git Bash needs `MSYS_NO_PATHCONV=1`, or the path gets mangled.
 - Add `-e XDEBUG_MODE=off` to one-off `php` commands in `gaia-dev` to silence Xdebug noise.
 - Don't `cat > file` without input (it waits on stdin until timeout).

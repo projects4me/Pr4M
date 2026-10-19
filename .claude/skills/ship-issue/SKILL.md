@@ -1,6 +1,6 @@
 ---
 name: ship-issue
-description: Finish a Projects4Me issue - run the full test suite, review the diff against the design rules, write the tracker notes, then (after the user approves) commit, push and open the PR as Agent Odysseus and hand the issue to the reviewer. Use when implementation is done or the user says "create/open/submit the PR".
+description: Finish a Projects4Me issue - run the full test suite, review the diff against the design rules, then (after the user approves) commit, push, open the PR, write the tracker notes and hand the issue to the reviewer in one ai ship call. Use when implementation is done or the user says "create/open/submit the PR".
 argument-hint: "<issue-number>"
 ---
 
@@ -8,15 +8,25 @@ argument-hint: "<issue-number>"
 
 Repo comes from the timer (`dev-tools/ai/state/timers.json`) or the branch `claude-issue-N`.
 
-1. **Tests:** delegate to the `test-runner` agent (`dev-tools/ai/ai test <repo>`). Any unexpected failure → fix first; report known failures as known.
-2. **Design check:** for non-trivial diffs, ask the `design-reviewer` agent to review `git diff origin/dev` against the repo's `### Design` section and Gaia review rules. Fix real findings.
+1. **Tests:** delegate the full run to the `test-runner` agent (`dev-tools/ai/ai test <repo>`). Fix any
+   unexpected failure first. Failures marked `(known)` already fail on the base commit (or are listed in
+   `dev-tools/ai/config.json`); report them as known, don't investigate them. `ai ship` refuses unless the last
+   full run passed on exactly the current tree, so re-run after any edit.
+2. **Design check:** for non-trivial diffs, ask the `design-reviewer` agent to review `git diff origin/dev` against the repo's `### Design` section and Gaia review rules. Fix real findings (then step 1 again).
 3. **Files:** list exactly the files this issue changed (`git status --short`). Never include files I didn't create for this issue, `CLAUDE.md`, or `tests/.phpunit.result.cache`.
-4. **Tracker notes:** `ai comment <issue> <file.html>` with what was done, decisions, files, test results, follow-ups. Log anything out of scope as a new issue instead of fixing it.
-5. **Approval:** summarise for the user and ask to commit + open the PR. An approval covers this PR only. If the user already said "create the PR", go ahead.
-6. **Commit + push:** write the message to a file (`type(scope): summary`, body, `Refs agaia-N`), then
-   `dev-tools/ai/ai commit <repo> <issue> -F <msg-file> --files <f1> <f2> ...`
-   (checks branch, refuses if origin/dev moved, appends the co-author trailer, pushes to `odysseus`).
-7. **PR + hand-off:** write the body (What · Why · How tested · Contract impact · Migration impact · Out of scope), then
-   `dev-tools/ai/ai pr <repo> <issue> --title "<title>" --body-file <file> --time-note "<what the last stretch covered>"`
-   This opens the PR, comments the link on the issue, logs actual elapsed time, sets `in_review` and assigns your reviewer (`ai/config.local.json`).
-8. Tell the user: PR link, test results, follow-up issues. Keep it short.
+4. **Approval:** summarise for the user and ask to commit + open the PR. An approval covers this PR only. If the user already said "create the PR" (or Talos assigned the issue), go ahead.
+5. **Ship in one call:** write `ship.json` (in the scratchpad or `dev-tools/ai/state/`):
+   ```json
+   {"title": "feat(scope): summary", "body": "commit body",
+    "files": ["path/a", "path/b"],
+    "what": "…", "why": "…", "howTested": "optional extra", "contract": "None or …", "migration": "None or …",
+    "outOfScope": "optional", "notes": "<p>decisions, deviations, follow-ups (HTML)</p>",
+    "timeNote": "what the last stretch covered"}
+   ```
+   Check it with `dev-tools/ai/ai ship <repo> <issue> ship.json --dry-run`, then run it without `--dry-run`.
+   It checks the branch and base, commits exactly `files` as Agent Odysseus (+co-author, `Refs <issue>`), pushes to
+   `odysseus`, opens the PR (body: What · Why · How tested with the recorded result · Contract · Migration · Out of
+   scope), posts the tracker notes with the PR link and test result, logs actual elapsed time, sets `in_review` and
+   assigns your reviewer. Docs-only change with no suite: `--no-tests "<why>"`.
+   Log anything out of scope as a new issue instead of fixing it.
+6. Tell the user: PR link, test results, follow-up issues. Keep it short.
