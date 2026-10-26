@@ -7,11 +7,15 @@ description: How to run and write tests in the Projects4Me repos - suite command
 
 **Run the full suite:** `dev-tools/ai/ai test <gaia|prometheus|hermes|dev-tools>` (or the `test-runner` agent). It prints summaries plus failures marked `(known)` / `<-- unexpected`; full logs in `dev-tools/ai/state/test-*.log`.
 
+**Full gaia run ≈ 1 min** (phpunit a few seconds, api ~1 min incl. the seed, in the copied-source `p4m-test-gaia-<key>` container; a baseline run adds about as much): run it in the foreground with a 600000 ms timeout, not `run_in_background` (Talos runs have no background tasks). Don't edit the repo while it runs: the result is fingerprinted at start, and a tree that changed mid-run is recorded stale and `ai ship` refuses it. A killed run's `pr4m_test` lock is taken over by the next run (dead holder PID); the wait message names the holder PID and command.
+
 **While fixing:** `dev-tools/ai/ai test <repo> --changed` runs only the tests mapped from the branch's changed files (fixed rules in `dev-tools/ai/lib/testmap.py`; it lists what it couldn't map), or `--filter "<text|/regex/>"`. A targeted run never satisfies `ai ship`, which needs a full passing run on the final tree.
+
+**Gaia test loop:** `ai doctor gaia` checks the test environment and prints the fix for each failure (`ai start` runs it); `ai test gaia --explain <case-id>` shows expected vs actual for one failed api case from the last log; `ai test gaia --case <id>` runs one api case on the already-seeded DB without re-seeding (substring match; cases that depend on earlier cases' data need the full run).
 
 **Known vs new failures:** a failure is known if it's in `dev-tools/ai/config.json` `knownFailures` or it also fails on the base commit. The first time a branch shows a failure not seen before, `ai test` runs that suite once on a detached worktree of the merge-base (`dev-tools/ai/state/baseline/<repo>`) and records the failing names (`ai baseline <repo>` does it on demand). Don't stash and re-run by hand.
 
-**Which code is tested:** `p4m test` runs against this workspace's checkout. If the shared container (`gaia-test`, `hermes`) mounts another folder, it starts a throwaway `p4m-test-*` container from the same image, env and network instead; Prometheus always uses its own test container with the source copied in and an incremental test build (`p4m test clean` removes them). Never `docker exec`/`docker run` the suites yourself.
+**Which code is tested:** `p4m test` runs against this workspace's checkout. Gaia always runs in its own `p4m-test-gaia-<key>` container (gaia-test's image, env and network, source copied in, OPcache on, Xdebug off). If the shared `hermes` container mounts another folder, it starts a throwaway `p4m-test-*` container from the same image, env and network instead; Prometheus always uses its own test container with the source copied in and an incremental test build (`p4m test clean` removes them). Never `docker exec`/`docker run` the suites yourself.
 
 ## Commands
 | Repo | Command | Notes |

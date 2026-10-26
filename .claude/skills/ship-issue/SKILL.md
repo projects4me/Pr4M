@@ -8,7 +8,8 @@ argument-hint: "<issue-number>"
 
 Repo comes from the timer (`dev-tools/ai/state/timers.json`) or the branch `claude-issue-N`.
 
-1. **Tests:** delegate the full run to the `test-runner` agent (`dev-tools/ai/ai test <repo>`). Fix any
+1. **Tests:** delegate the full run to the `test-runner` agent (`dev-tools/ai/ai test <repo>`, in the foreground;
+   a full gaia run takes about a minute). Don't edit the repo while it runs. Use `--changed` while fixing. Fix any
    unexpected failure first. Failures marked `(known)` already fail on the base commit (or are listed in
    `dev-tools/ai/config.json`); report them as known, don't investigate them. `ai ship` refuses unless the last
    full run passed on exactly the current tree, so re-run after any edit.
