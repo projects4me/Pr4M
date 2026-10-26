@@ -30,6 +30,9 @@ Time is tracked by checkpoints: `dev-tools/ai/ai time <issue> "<what was done>"`
 |---|---|
 | Context pack for the issue | `dev-tools/ai/ai context <issue>` |
 | Fast check while fixing | `dev-tools/ai/ai test <repo> --changed` (tests mapped from changed files, seconds) or `--filter "<text or /regex/>"` |
+| Gaia environment check (also run by `ai start`) | `dev-tools/ai/ai doctor gaia` (each failure prints its fix) |
+| Explain one failed api case | `dev-tools/ai/ai test gaia --explain <case-id>` |
+| Run one api case, no re-seed | `dev-tools/ai/ai test gaia --case <id>` |
 | Full suite (before shipping) | `dev-tools/ai/ai test <repo>`: runs against this workspace's checkout; failures already failing on dev are marked `(known)` by name |
 | One PHPUnit file | `dev-tools/installer/p4m test phpunit <file>` |
 | Ship (tests gate, commit, PR, notes, time, in_review) | `dev-tools/ai/ai ship <repo> <issue> ship.json` (see `/ship-issue`) |
