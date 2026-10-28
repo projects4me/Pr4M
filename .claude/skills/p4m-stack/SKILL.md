@@ -37,3 +37,4 @@ description: Projects4Me local stack reference - p4m CLI, local URLs, containers
 
 ## Browser checks
 Playwright (Python) with `channel="chrome"` in a scratchpad venv; log in with the credentials from `dev-tools/gaia-mcp/gaia-mcp.env` (never print them). Compare a UI change next to an existing screen of the same type.
+- Run each check under the dev-stack lock: `dev-tools/ai/ai devstack -- <venv python> <check script>`. Parallel agent runs share gaia-dev and Prometheus on :4200, so they take turns; the lock is released when the command exits.
