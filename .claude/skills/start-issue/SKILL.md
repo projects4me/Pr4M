@@ -12,7 +12,7 @@ argument-hint: "<issue-number> [gaia|prometheus|hermes|ares|dev-tools|pr4m]"
    `dev-tools/ai/ai start <repo> <issue>`
    If the base branch can't fast-forward, stop and tell the user.
 3. Run `dev-tools/ai/ai context <issue>`: the files, classes and endpoints the issue names, as outlines with
-   line numbers, plus their tests, api-tester cases, recent commits and the referenced issues' status. Check the
+   line numbers, plus their tests, api-tester cases, recent commits and the referenced issues' status. For Gaia issues the output ends with a Gaia pack (model summaries, ACL rows, cases, doc sections, closest bundle and its exemplar PR, gaia-dev checks): use it instead of looking those up. Check the
    real dependencies from it ("Depends on" merged? referenced code exists?). If one isn't met, say so and stop.
 4. Check scope against the house rules before planning:
    - Gaia: standard CRUD only, no custom REST actions or one-off routes; tests never change the system under test (see memory `gaia-rest-and-testing-rules`).
