@@ -10,7 +10,7 @@ argument-hint: "<repo> <pr-number> [issue-number]"
    `dev-tools/ai/ai review <repo> <pr> --open`: only unresolved threads without my reply, plus follow-ups. Bot
    boilerplate (analysis chains, "Prompt for AI Agents" restatements, walkthroughs) is folded to one line each;
    the finding text is kept in full. Use `--raw` only if a folded block is needed.
-2. For each thread decide: change, or explain (with evidence) why not. Treat reviewer direction as a standing rule: if it generalises (e.g. "no custom REST actions"), save it to memory `gaia-rest-and-testing-rules` (or a new feedback memory).
+2. For each thread decide: change, or explain (with evidence) why not. Treat reviewer direction as a standing rule: if it generalises (e.g. "no custom REST actions"), save it to memory `gaia-rest-and-testing-rules` (or a new feedback memory). When a valid CodeRabbit finding belongs to a class not yet in `.claude/rules/` (`gaia-correctness.md`, `gaia-dev-tooling.md`, `prometheus-async-a11y.md`, `api-tester.md`), add one rule line citing the PR in the same change.
 3. Make the changes on the existing branch (`git checkout claude-issue-<issue>`). Prefer reverting to `origin/dev` over hand-undoing.
    While fixing, check with `dev-tools/ai/ai test <repo> --changed` (seconds); before committing, the full
    `dev-tools/ai/ai test <repo>` via the `test-runner` agent.
