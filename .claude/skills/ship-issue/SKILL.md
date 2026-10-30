@@ -25,9 +25,10 @@ Repo comes from the timer (`dev-tools/ai/state/timers.json`) or the branch `clau
     "timeNote": "what the last stretch covered"}
    ```
    Check it with `dev-tools/ai/ai ship <repo> <issue> ship.json --dry-run`, then run it without `--dry-run`.
-   It checks the branch and base, commits exactly `files` as Agent Odysseus (+co-author, `Refs <issue>`), pushes to
+   For Gaia it first runs the gaia-dev checks (`graph export --check`, `docs generate --check`, `check api-cases`) and stops on a failure. It checks the branch and base, commits exactly `files` as Agent Odysseus (+co-author, `Refs <issue>`), pushes to
    `odysseus`, opens the PR (body: What · Why · How tested with the recorded result · Contract · Migration · Out of
    scope), posts the tracker notes with the PR link and test result, logs actual elapsed time, sets `in_review` and
-   assigns your reviewer. Docs-only change with no suite: `--no-tests "<why>"`.
+   assigns your reviewer. With `--defer-handoff` it hands off normally when the repo isn't in `codeRabbitRepos`
+   (output says "CodeRabbit not enabled"): then finish `done`, not `awaiting_bot_review`. Docs-only change with no suite: `--no-tests "<why>"`.
    Log anything out of scope as a new issue instead of fixing it.
 6. Tell the user: PR link, test results, follow-up issues. Keep it short.

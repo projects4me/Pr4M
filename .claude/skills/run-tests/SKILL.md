@@ -20,7 +20,7 @@ description: How to run and write tests in the Projects4Me repos - suite command
 ## Commands
 | Repo | Command | Notes |
 |---|---|---|
-| gaia PHPUnit | `dev-tools/installer/p4m test phpunit tests/libraries/security` and `.../utils`, or one file | CI runs both folders |
+| gaia PHPUnit | `dev-tools/installer/p4m test phpunit tests/libraries/security`, `.../utils` and `tests/tools`, or one file | CI runs all three; `tests/tools` holds the gaia-dev consistency checks (graph up to date, behaviours tested, scaffolder anchors) |
 | gaia API | `dev-tools/installer/p4m db prepare-test` then `dev-tools/installer/p4m test api --mode backend,acl,client [--filter a\|b]` | `ai test` does both under a lock (every run re-seeds `pr4m_test`). CI runs backend,acl. Known failure: client `post-membership-api-v1-membership` (agaia-3970) |
 | prometheus | `dev-tools/installer/p4m test ember [--filter "<text or /regex/i>"]` | first run builds (~1 min), reruns 10–15 s; full suite ~1½ min, ~509 tests |
 | hermes | `dev-tools/installer/p4m test hermes` | node:test, in-process app with a fake Gaia loader |
@@ -28,14 +28,8 @@ description: How to run and write tests in the Projects4Me repos - suite command
 | ares | none yet | add pytest + FastAPI TestClient under `tests/` with a fake adapter; never call the real API |
 
 ## Gaia
-- **Unit tests** (`tests/libraries/security|utils`, the folders CI runs): stub external systems by subclassing or overriding a protected seam (e.g. a fake `Mailer`); never add test-only endpoints, flags or constants to production code. Each test file must pass when run alone.
-- **api-tester catalogs** (`tools/api-tester/apis/`):
-  - `backend.json` is generated (`php tools/api-tester/bin/generate-backend-apis.php`); don't hand-edit it. If regenerating shows unrelated drift, revert it.
-  - `client.json` / `acl.json` are hand-maintained. Append cases with `dev-tools/ai/ai api-cases client|acl <cases.json>` (keeps each file's style; re-serialising reformats the whole file).
-  - Assertions: `status`, `shape`, `errorEqual`, `attributesPresent/Absent/Equal`, `idsIncludes`, `idsExcludes`, `resourceNamesPresent/Absent`, `includedTypesPresent/Absent`; `store` captures runtime ids (`{runtime.x}`); fixture values like `{issuestatusId}`.
-  - Auth profiles (`fixtures/default.json`, seeded in `harness/prepare-test-db.sh`): `aclNoProject`, `aclProjectOnly`, `aclMembers`, `aclNoConversation`, `aclFields`, `aclNoSetting`. New profile = user + role + user_role + permissions in the harness and the fixture.
-  - Every new resource or permission rule gets `acl` cases; a bug fix starts with a failing case.
-- Never point a test at real external services (SMTP etc.); `gaia-test` has real Gmail credentials.
+- Conventions for unit tests and the api-tester load from `.claude/rules/api-tester.md` when you touch `gaia/tools/api-tester/**` or `gaia/tests/**`.
+- Checks before shipping: `php tools/gaia-dev/bin/gaia-dev check api-cases` (plus `graph export --check`, `docs generate --check`); `ai ship` runs them for Gaia PRs.
 
 ## Prometheus
 Acceptance tests are Gherkin (`tests/acceptance/**/*.feature`, ember-cli-yadda) on Mirage: start from `There is no pre-existing data` / `default scenario is loaded`, add feature data with `<Model> has following details` tables, put new steps in `tests/acceptance/steps/<area>/` and register them in `steps.js`. Update the Mirage factory when a model gains attributes.
