@@ -13,4 +13,5 @@ paths:
   - Assertions: `gaia-dev assertions` lists them; `store` captures runtime ids (`{runtime.x}`); fixture values like `{issuestatusId}`.
   - Auth profiles (`fixtures/default.json`, seeded in `harness/prepare-test-db.sh`): `gaia-dev profiles`. New profile = user + role + user_role + permissions in the harness and the fixture (`gaia-dev scaffold api-cases --new-profile`).
   - Every new resource or permission rule gets `acl` cases; a bug fix starts with a failing case. Check with `gaia-dev check api-cases`.
+- **Test strength:** every new test must fail if the line it covers is reverted; assert the body or stored state, not just the status; every failure path (validation, permission, odd input) gets its own rejection case (g199/203).
 - Never point a test at real external services (SMTP etc.); `gaia-test` has real Gmail credentials.

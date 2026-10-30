@@ -13,7 +13,7 @@ Repo comes from the timer (`dev-tools/ai/state/timers.json`) or the branch `clau
    unexpected failure first. Failures marked `(known)` already fail on the base commit (or are listed in
    `dev-tools/ai/config.json`); report them as known, don't investigate them. `ai ship` refuses unless the last
    full run passed on exactly the current tree, so re-run after any edit.
-2. **Design check:** for non-trivial diffs, ask the `design-reviewer` agent to review `git diff origin/dev` against the repo's `### Design` section and Gaia review rules. Fix real findings (then step 1 again).
+2. **Review (required for every code change):** run the `design-reviewer` and `correctness-reviewer` agents in parallel (two foreground calls in one message) on `git diff origin/dev`; docs-only changes may skip. `design-reviewer` checks the repo's `### Design` section and Gaia review rules; `correctness-reviewer` walks failure, repeat, race, odd-input and permission cases against `.claude/rules/`. Fix real findings (then step 1 again).
 3. **Files:** list exactly the files this issue changed (`git status --short`). Never include files I didn't create for this issue, `CLAUDE.md`, or `tests/.phpunit.result.cache`.
 4. **Approval:** summarise for the user and ask to commit + open the PR. An approval covers this PR only. If the user already said "create the PR" (or Talos assigned the issue), go ahead.
 5. **Ship in one call:** write `ship.json` (in the scratchpad or `dev-tools/ai/state/`):
