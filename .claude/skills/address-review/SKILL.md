@@ -1,16 +1,23 @@
 ---
 name: address-review
-description: Address PR review feedback on a Projects4Me PR - fetch open review threads, make the changes, re-test, push a follow-up commit, reply to each thread, update the PR description and tracker. Use when the user says they reviewed/commented on a PR or asks to handle review comments.
+description: Address review feedback on a Projects4Me PR - open review threads, the reviewer's Gaia comments on the issue and failing CI - make the changes, re-test, push a follow-up commit, reply to each thread, update the PR description and tracker. Use when the user says they reviewed/commented on a PR or asks to handle review comments.
 argument-hint: "<repo> <pr-number> [issue-number]"
 ---
 
 # Address a PR review
 
 1. `dev-tools/ai/ai timer <issue>` (start the time checkpoint), then
-   `dev-tools/ai/ai review <repo> <pr> --open`: only unresolved threads without my reply, plus follow-ups. Bot
+   `dev-tools/ai/ai review <repo> <pr> --open --issue <issue>`: unresolved threads without my reply, plus
+   follow-ups, the CI state of the PR head, and the reviewer's Gaia comments since my last hand-off. Bot
    boilerplate (analysis chains, "Prompt for AI Agents" restatements, walkthroughs) is folded to one line each;
    the finding text is kept in full. Use `--raw` only if a folded block is needed.
-2. For each thread decide: change, or explain (with evidence) why not. Treat reviewer direction as a standing rule: if it generalises (e.g. "no custom REST actions"), save it to memory `gaia-rest-and-testing-rules` (or a new feedback memory). When a valid CodeRabbit finding belongs to a class not yet in `.claude/rules/` (`gaia-correctness.md`, `gaia-dev-tooling.md`, `prometheus-async-a11y.md`, `api-tester.md`), add one rule line citing the PR in the same change.
+   Feedback comes from three places, and an approved PR can still have feedback in any of them:
+   - open review threads on the PR;
+   - the reviewer's comments on the Gaia issue;
+   - failing CI on the PR head.
+
+   Treat each of them as review feedback. Only when all three are clear is there nothing to address.
+2. For each thread, comment or failing check, decide: change, or explain (with evidence) why not. Treat reviewer direction as a standing rule: if it generalises (e.g. "no custom REST actions"), save it to memory `gaia-rest-and-testing-rules` (or a new feedback memory). When a valid CodeRabbit finding belongs to a class not yet in `.claude/rules/` (`gaia-correctness.md`, `gaia-dev-tooling.md`, `prometheus-async-a11y.md`, `api-tester.md`), add one rule line citing the PR in the same change.
 3. Make the changes on the existing branch (`git checkout claude-issue-<issue>`). Prefer reverting to `origin/dev` over hand-undoing.
    While fixing, check with `dev-tools/ai/ai test <repo> --changed` (seconds); before committing, the full
    `dev-tools/ai/ai test <repo>` via the `test-runner` agent.
@@ -18,6 +25,13 @@ argument-hint: "<repo> <pr-number> [issue-number]"
    `dev-tools/ai/ai commit <repo> <issue> -F <msg-file> --files ...` (message: `refactor|fix(scope): ... Review feedback on #<pr>`).
 5. Reply to every thread in one call: write `{"<comment id>": "<reply>"}` to a JSON file, then
    `dev-tools/ai/ai reply <repo> <pr> <file.json>`. Say what changed and the commit hash; answer questions directly.
+   Answer Gaia comments in the tracker comment of step 7.
 6. If scope changed, update the description: `dev-tools/ai/ai pr-body <repo> <pr> <file.md>`.
-7. Tracker: `ai comment <issue> <file.html>` summarising the round, then `ai time <issue> "review round: ..."`. Then hand it back: `dev-tools/ai/ai status <issue> in_review --assignee reviewer` (Talos moves picked-up issues to `in_progress`, so set it explicitly).
+7. Tracker: summarise the round with `ai comment <issue> -` and the HTML on stdin (a heredoc), then log it with
+   `ai time <issue> "review round: ..."`. Don't write the comment to `/tmp`: Git Bash's `/tmp` is not a path the
+   Windows Python behind `ai` can open. Run each command on its own and check that it succeeded before you go on.
+   - **Interactive session:** hand it back with `dev-tools/ai/ai status <issue> in_review --assignee reviewer`
+     (Talos moves picked-up issues to `in_progress`, so set it explicitly).
+   - **Talos run** (headless, started with "reviewed the PR … assigned it back to you"): don't set the status or
+     assignee. Talos hands the issue back after you end with `done`.
 8. Tell the user what changed per comment and any open question, in a few lines.
